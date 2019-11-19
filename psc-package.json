@@ -1,0 +1,6 @@
+{
+  "name": "purescript-arduino",
+  "set": "psc-0.13.4",
+  "source": "https://github.com/purescript/package-sets.git",
+  "depends": ["prelude", "console", "effect", "prelude", "psci-support"]
+}
