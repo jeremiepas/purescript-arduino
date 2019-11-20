@@ -7,12 +7,13 @@ let
   
   pkgs =  import (
     nixpkgsSrc
-  ) { };
+  ) { config.allowUnsupportedSystem = true; };
   pkgs' = import ./nix/vscode.nix {inherit pkgs ;}
   // import ./nix/purescript.nix {inherit pkgs ;};
 
   ffi-cpp = import ./nix/purescript-ffi.nix {inherit pkgs; };
   arduinoSTL = import ./nix/arduinoSTL.nix {inherit pkgs; };
+  # avr-gcc = import ./nix/avr-gcc.nix {inherit pkgs; };
 
   pname = "purescriptearningbook";
   version = "0.0.1";
@@ -36,6 +37,8 @@ in
     ];
 
   shellHook = ''
+    PATH=$PATH:$PWD/bin
+    export BOOST=${pkgs.boost}
     export ARDUINO_STL=${arduinoSTL}
     export BOOST=${pkgs.boost}
     export FFI_SRC=$PWD/ffi
