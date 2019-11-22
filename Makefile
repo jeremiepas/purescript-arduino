@@ -22,8 +22,9 @@ OUTPUT      := output
 CC_SRC      := $(OUTPUT)/src
 FFI_SRC     := ffi
 BIN         := main
-# CXX					:= avr-gcc
-CXX         := $(ARDUINO_Amemory library c++PLICATIOON)/share/arduino/hardware/tools/avr/bin/avr-g++
+DCXX 				:= gcc
+# CXX					:= avr-cpp
+CXX         := $(ARDUINO_APLICATIOON)/share/arduino/hardware/tools/avr/bin/avr-g++
 CC          := $(ARDUINO_APLICATIOON)/share/arduino/hardware/tools/avr/bin/avr-gcc
 AVRDUDE     := $(ARDUINO_APLICATIOON)/share/arduino/hardware/tools/avr/bin/avrdude
 AVRCFG      := $(ARDUINO_APLICATIOON)/share/arduino/hardware/tools/avr/etc/avrdude.conf
@@ -34,8 +35,7 @@ AVRTYPE     := atmega328p
 DEVICE      := arduino
 
 override PURSFLAGS += compile --codegen corefn
-override CXXFLAGS += -std=c++11  \
-                     -w \
+override CXXFLAGS += -w \
                      -flto \
                      -fpermissive \
                      -fexceptions \
@@ -63,10 +63,13 @@ endif
 DEBUG := "-DDEBUG -g"
 RELEASE := "-DNDEBUG -O3"
 
-INCLUDES :=   -I $(CC_SRC) -I$(ARDUINOSTL) \
-                         -I$(ARDUINO_VARIANTS) \
-                         -I$(BOOST)/lib \
-                        #  -I$(ARDUINO_STL)/src
+INCLUDES :=		-I$(CC_SRC) \
+							-I$(ARDUINOSTL) \
+							-I$(ARDUINO_VARIANTS) \
+							-I$(ARDUINO_STL)/src \
+							-I$(CC_SRC) \
+							-I$(BOOST)/lib \
+							-std=c++11  
 
 BIN_DIR := $(OUTPUT)/bin
 
@@ -131,23 +134,23 @@ $(BIN): $(OBJS)
 
 %.o: %.cpp
 	@echo "Creating" $@ "(C++)"
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP $< -o $@
 
 %.o: %.cc
 	@echo "Creating" $@ "(C++)"
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP $< -o $@
 
 %.o: %.mm
 	@echo "Creating" $@ "(Objective-C++)"
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP $< -o $@
 
 %.o: %.c
 	@echo "Creating" $@ "(C)"
-	@$(CXX) $(CFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+	@$(CXX) $(CFLAGS) $(INCLUDES) -MMD -MP $< -o $@
 
 %.o: %.m
 	@echo "Creating" $@ "(Objective-C)"
-	@$(CXX) $(CFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+	@$(CXX) $(CFLAGS) $(INCLUDES) -MMD -MP $< -o $@
 
 .PHONY: all
 all: release
