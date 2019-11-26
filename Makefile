@@ -21,10 +21,10 @@ SRC         := src
 OUTPUT      := output
 CC_SRC      := $(OUTPUT)/src
 FFI_SRC     := ffi
-BIN         := main
+BIN         := main.elf
 DCXX 				:= gcc
-# CXX					:= avr-cpp
-CXX         := $(ARDUINO_APLICATIOON)/share/arduino/hardware/tools/avr/bin/avr-g++
+CXX					:= avr-g++
+# CXX         := $(ARDUINO_APLICATIOON)/share/arduino/hardware/tools/avr/bin/avr-g++
 CC          := $(ARDUINO_APLICATIOON)/share/arduino/hardware/tools/avr/bin/avr-gcc
 AVRDUDE     := $(ARDUINO_APLICATIOON)/share/arduino/hardware/tools/avr/bin/avrdude
 AVRCFG      := $(ARDUINO_APLICATIOON)/share/arduino/hardware/tools/avr/etc/avrdude.conf
@@ -35,7 +35,9 @@ AVRTYPE     := atmega328p
 DEVICE      := arduino
 
 override PURSFLAGS += compile --codegen corefn
-override CXXFLAGS += -w \
+override CXXFLAGS += -std=gnu++17 \
+										 -w \
+										 -Wcpp \
                      -flto \
                      -fpermissive \
                      -fexceptions \
@@ -63,13 +65,14 @@ endif
 DEBUG := "-DDEBUG -g"
 RELEASE := "-DNDEBUG -O3"
 
-INCLUDES :=		-I$(CC_SRC) \
+INCLUDES :=	  -I/nix/store/24l5rfm2xhqkx96jvq0rg8pplb89b9hv-gcc-8.3.0/include/c++/8.3.0/x86_64-unknown-linux-gnu \
+							-I/usr/include/c++/7 \
+							-I$(CC_SRC) \
 							-I$(ARDUINOSTL) \
 							-I$(ARDUINO_VARIANTS) \
 							-I$(ARDUINO_STL)/src \
 							-I$(CC_SRC) \
-							-I$(BOOST)/lib \
-							-std=c++11  
+
 
 BIN_DIR := $(OUTPUT)/bin
 
@@ -127,8 +130,8 @@ DEPS  = $(OBJS:.o=.d)
 
 $(BIN): $(OBJS)
 	@echo "Linking" $(BIN_DIR)/$(BIN)
+	$(CXX) $^ -o $(BIN_DIR)/$@ $(LDFLAGS)
 	@mkdir -p $(BIN_DIR)
-	@$(CXX) $^ -o $(BIN_DIR)/$@ $(LDFLAGS)
 
 -include $(DEPS)
 
@@ -146,7 +149,7 @@ $(BIN): $(OBJS)
 
 %.o: %.c
 	@echo "Creating" $@ "(C)"
-	@$(CXX) $(CFLAGS) $(INCLUDES) -MMD -MP $< -o $@
+	@$(CXX) -mmcu=$(AVRTYPE) $(CFLAGS) $(INCLUDES) -MMD -MP $< -o $@
 
 %.o: %.m
 	@echo "Creating" $@ "(Objective-C)"
